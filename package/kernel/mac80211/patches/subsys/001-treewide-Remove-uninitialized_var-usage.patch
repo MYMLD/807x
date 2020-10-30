@@ -1,0 +1,254 @@
+From 3f649ab728cda8038259d8f14492fe400fbab911 Mon Sep 17 00:00:00 2001
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 3 Jun 2020 13:09:38 -0700
+Subject: [PATCH] treewide: Remove uninitialized_var() usage
+
+Using uninitialized_var() is dangerous as it papers over real bugs[1]
+(or can in the future), and suppresses unrelated compiler warnings
+(e.g. "unused variable"). If the compiler thinks it is uninitialized,
+either simply initialize the variable or make compiler changes.
+
+In preparation for removing[2] the[3] macro[4], remove all remaining
+needless uses with the following script:
+
+git grep '\buninitialized_var\b' | cut -d: -f1 | sort -u | \
+	xargs perl -pi -e \
+		's/\buninitialized_var\(([^\)]+)\)/\1/g;
+		 s:\s*/\* (GCC be quiet|to make compiler happy) \*/$::g;'
+
+drivers/video/fbdev/riva/riva_hw.c was manually tweaked to avoid
+pathological white-space.
+
+No outstanding warnings were found building allmodconfig with GCC 9.3.0
+for x86_64, i386, arm64, arm, powerpc, powerpc64le, s390x, mips, sparc64,
+alpha, and m68k.
+
+[1] https://lore.kernel.org/lkml/20200603174714.192027-1-glider@google.com/
+[2] https://lore.kernel.org/lkml/CA+55aFw+Vbj0i=1TGqCR5vQkCzWJ0QxK6CernOU6eedsudAixw@mail.gmail.com/
+[3] https://lore.kernel.org/lkml/CA+55aFwgbgqhbp1fkxvRKEpzyR5J8n1vKT1VZdz9knmPuXhOeg@mail.gmail.com/
+[4] https://lore.kernel.org/lkml/CA+55aFz2500WfbKXAx8s67wrm9=yVJu65TpLgN_ybYNv0VEOKA@mail.gmail.com/
+
+Reviewed-by: Leon Romanovsky <leonro@mellanox.com> # drivers/infiniband and mlx4/mlx5
+Acked-by: Jason Gunthorpe <jgg@mellanox.com> # IB
+Acked-by: Kalle Valo <kvalo@codeaurora.org> # wireless drivers
+Reviewed-by: Chao Yu <yuchao0@huawei.com> # erofs
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/net/wireless/ath/ath10k/core.c           |  2 +-
+ drivers/net/wireless/ath/ath6kl/init.c           |  2 +-
+ drivers/net/wireless/ath/ath9k/init.c            |  2 +-
+ drivers/net/wireless/broadcom/b43/debugfs.c      |  2 +-
+ drivers/net/wireless/broadcom/b43/dma.c          |  2 +-
+ drivers/net/wireless/broadcom/b43/lo.c           |  2 +-
+ drivers/net/wireless/broadcom/b43/phy_n.c        |  2 +-
+ drivers/net/wireless/broadcom/b43/xmit.c         | 12 ++++++------
+ .../net/wireless/broadcom/b43legacy/debugfs.c    |  2 +-
+ drivers/net/wireless/broadcom/b43legacy/main.c   |  2 +-
+ drivers/net/wireless/intel/iwlegacy/3945.c       |  2 +-
+ drivers/net/wireless/intel/iwlegacy/4965-mac.c   |  2 +-
+ .../net/wireless/realtek/rtlwifi/rtl8192cu/hw.c  |  4 ++--
+
+diff --git a/drivers/net/wireless/ath/ath10k/core.c b/drivers/net/wireless/ath/ath10k/core.c
+index 22b6937ac225..340ce327ac14 100644
+--- a/drivers/net/wireless/ath/ath10k/core.c
++++ b/drivers/net/wireless/ath/ath10k/core.c
+@@ -2240,7 +2240,7 @@ static int ath10k_init_uart(struct ath10k *ar)
+ 
+ static int ath10k_init_hw_params(struct ath10k *ar)
+ {
+-	const struct ath10k_hw_params *uninitialized_var(hw_params);
++	const struct ath10k_hw_params *hw_params;
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(ath10k_hw_params_list); i++) {
+diff --git a/drivers/net/wireless/ath/ath6kl/init.c b/drivers/net/wireless/ath/ath6kl/init.c
+index aa1c71a76ef7..811fad6d60c0 100644
+--- a/drivers/net/wireless/ath/ath6kl/init.c
++++ b/drivers/net/wireless/ath/ath6kl/init.c
+@@ -1575,7 +1575,7 @@ static int ath6kl_init_upload(struct ath6kl *ar)
+ 
+ int ath6kl_init_hw_params(struct ath6kl *ar)
+ {
+-	const struct ath6kl_hw *uninitialized_var(hw);
++	const struct ath6kl_hw *hw;
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(hw_list); i++) {
+diff --git a/drivers/net/wireless/ath/ath9k/init.c b/drivers/net/wireless/ath/ath9k/init.c
+index 289a2444d534..4d72cd7daaa2 100644
+--- a/drivers/net/wireless/ath/ath9k/init.c
++++ b/drivers/net/wireless/ath/ath9k/init.c
+@@ -230,7 +230,7 @@ static unsigned int ath9k_reg_rmw(void *hw_priv, u32 reg_offset, u32 set, u32 cl
+ 	struct ath_hw *ah = hw_priv;
+ 	struct ath_common *common = ath9k_hw_common(ah);
+ 	struct ath_softc *sc = (struct ath_softc *) common->priv;
+-	unsigned long uninitialized_var(flags);
++	unsigned long flags;
+ 	u32 val;
+ 
+ 	if (NR_CPUS > 1 && ah->config.serialize_regmode == SER_REG_MODE_ON) {
+diff --git a/drivers/net/wireless/broadcom/b43/debugfs.c b/drivers/net/wireless/broadcom/b43/debugfs.c
+index dc1819ca52ac..89a25aefb327 100644
+--- a/drivers/net/wireless/broadcom/b43/debugfs.c
++++ b/drivers/net/wireless/broadcom/b43/debugfs.c
+@@ -493,7 +493,7 @@ static ssize_t b43_debugfs_read(struct file *file, char __user *userbuf,
+ 	struct b43_wldev *dev;
+ 	struct b43_debugfs_fops *dfops;
+ 	struct b43_dfs_file *dfile;
+-	ssize_t uninitialized_var(ret);
++	ssize_t ret;
+ 	char *buf;
+ 	const size_t bufsize = 1024 * 16; /* 16 kiB buffer */
+ 	const size_t buforder = get_order(bufsize);
+diff --git a/drivers/net/wireless/broadcom/b43/dma.c b/drivers/net/wireless/broadcom/b43/dma.c
+index 9733c64bf978..ca671fc13116 100644
+--- a/drivers/net/wireless/broadcom/b43/dma.c
++++ b/drivers/net/wireless/broadcom/b43/dma.c
+@@ -37,7 +37,7 @@
+ static u32 b43_dma_address(struct b43_dma *dma, dma_addr_t dmaaddr,
+ 			   enum b43_addrtype addrtype)
+ {
+-	u32 uninitialized_var(addr);
++	u32 addr;
+ 
+ 	switch (addrtype) {
+ 	case B43_DMA_ADDR_LOW:
+diff --git a/drivers/net/wireless/broadcom/b43/lo.c b/drivers/net/wireless/broadcom/b43/lo.c
+index 5d97cf06eceb..338b6545a1e7 100644
+--- a/drivers/net/wireless/broadcom/b43/lo.c
++++ b/drivers/net/wireless/broadcom/b43/lo.c
+@@ -729,7 +729,7 @@ struct b43_lo_calib *b43_calibrate_lo_setting(struct b43_wldev *dev,
+ 	};
+ 	int max_rx_gain;
+ 	struct b43_lo_calib *cal;
+-	struct lo_g_saved_values uninitialized_var(saved_regs);
++	struct lo_g_saved_values saved_regs;
+ 	/* Values from the "TXCTL Register and Value Table" */
+ 	u16 txctl_reg;
+ 	u16 txctl_value;
+diff --git a/drivers/net/wireless/broadcom/b43/phy_n.c b/drivers/net/wireless/broadcom/b43/phy_n.c
+index 46db91846007..39de18d3ce91 100644
+--- a/drivers/net/wireless/broadcom/b43/phy_n.c
++++ b/drivers/net/wireless/broadcom/b43/phy_n.c
+@@ -5643,7 +5643,7 @@ static int b43_nphy_rev2_cal_rx_iq(struct b43_wldev *dev,
+ 	u8 rfctl[2];
+ 	u8 afectl_core;
+ 	u16 tmp[6];
+-	u16 uninitialized_var(cur_hpf1), uninitialized_var(cur_hpf2), cur_lna;
++	u16 cur_hpf1, cur_hpf2, cur_lna;
+ 	u32 real, imag;
+ 	enum nl80211_band band;
+ 
+diff --git a/drivers/net/wireless/broadcom/b43/xmit.c b/drivers/net/wireless/broadcom/b43/xmit.c
+index 55babc6d1091..7651b1bdb592 100644
+--- a/drivers/net/wireless/broadcom/b43/xmit.c
++++ b/drivers/net/wireless/broadcom/b43/xmit.c
+@@ -422,10 +422,10 @@ int b43_generate_txhdr(struct b43_wldev *dev,
+ 	if ((rates[0].flags & IEEE80211_TX_RC_USE_RTS_CTS) ||
+ 	    (rates[0].flags & IEEE80211_TX_RC_USE_CTS_PROTECT)) {
+ 		unsigned int len;
+-		struct ieee80211_hdr *uninitialized_var(hdr);
++		struct ieee80211_hdr *hdr;
+ 		int rts_rate, rts_rate_fb;
+ 		int rts_rate_ofdm, rts_rate_fb_ofdm;
+-		struct b43_plcp_hdr6 *uninitialized_var(plcp);
++		struct b43_plcp_hdr6 *plcp;
+ 		struct ieee80211_rate *rts_cts_rate;
+ 
+ 		rts_cts_rate = ieee80211_get_rts_cts_rate(dev->wl->hw, info);
+@@ -436,7 +436,7 @@ int b43_generate_txhdr(struct b43_wldev *dev,
+ 		rts_rate_fb_ofdm = b43_is_ofdm_rate(rts_rate_fb);
+ 
+ 		if (rates[0].flags & IEEE80211_TX_RC_USE_CTS_PROTECT) {
+-			struct ieee80211_cts *uninitialized_var(cts);
++			struct ieee80211_cts *cts;
+ 
+ 			switch (dev->fw.hdr_format) {
+ 			case B43_FW_HDR_598:
+@@ -458,7 +458,7 @@ int b43_generate_txhdr(struct b43_wldev *dev,
+ 			mac_ctl |= B43_TXH_MAC_SENDCTS;
+ 			len = sizeof(struct ieee80211_cts);
+ 		} else {
+-			struct ieee80211_rts *uninitialized_var(rts);
++			struct ieee80211_rts *rts;
+ 
+ 			switch (dev->fw.hdr_format) {
+ 			case B43_FW_HDR_598:
+@@ -637,8 +637,8 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
+ 	const struct b43_rxhdr_fw4 *rxhdr = _rxhdr;
+ 	__le16 fctl;
+ 	u16 phystat0, phystat3;
+-	u16 uninitialized_var(chanstat), uninitialized_var(mactime);
+-	u32 uninitialized_var(macstat);
++	u16 chanstat, mactime;
++	u32 macstat;
+ 	u16 chanid;
+ 	int padding, rate_idx;
+ 
+diff --git a/drivers/net/wireless/broadcom/b43legacy/debugfs.c b/drivers/net/wireless/broadcom/b43legacy/debugfs.c
+index fa133dfb2ecb..e7e4293c01f2 100644
+--- a/drivers/net/wireless/broadcom/b43legacy/debugfs.c
++++ b/drivers/net/wireless/broadcom/b43legacy/debugfs.c
+@@ -190,7 +190,7 @@ static ssize_t b43legacy_debugfs_read(struct file *file, char __user *userbuf,
+ 	struct b43legacy_wldev *dev;
+ 	struct b43legacy_debugfs_fops *dfops;
+ 	struct b43legacy_dfs_file *dfile;
+-	ssize_t uninitialized_var(ret);
++	ssize_t ret;
+ 	char *buf;
+ 	const size_t bufsize = 1024 * 16; /* 16 KiB buffer */
+ 	const size_t buforder = get_order(bufsize);
+diff --git a/drivers/net/wireless/broadcom/b43legacy/main.c b/drivers/net/wireless/broadcom/b43legacy/main.c
+index 5208a39fd6f7..220c11d34c23 100644
+--- a/drivers/net/wireless/broadcom/b43legacy/main.c
++++ b/drivers/net/wireless/broadcom/b43legacy/main.c
+@@ -2580,7 +2580,7 @@ static void b43legacy_put_phy_into_reset(struct b43legacy_wldev *dev)
+ static int b43legacy_switch_phymode(struct b43legacy_wl *wl,
+ 				      unsigned int new_mode)
+ {
+-	struct b43legacy_wldev *uninitialized_var(up_dev);
++	struct b43legacy_wldev *up_dev;
+ 	struct b43legacy_wldev *down_dev;
+ 	int err;
+ 	bool gmode = false;
+diff --git a/drivers/net/wireless/intel/iwlegacy/3945.c b/drivers/net/wireless/intel/iwlegacy/3945.c
+index 2ac494f5ae22..fd63eba47ba2 100644
+--- a/drivers/net/wireless/intel/iwlegacy/3945.c
++++ b/drivers/net/wireless/intel/iwlegacy/3945.c
+@@ -2100,7 +2100,7 @@ il3945_txpower_set_from_eeprom(struct il_priv *il)
+ 
+ 		/* set tx power value for all OFDM rates */
+ 		for (rate_idx = 0; rate_idx < IL_OFDM_RATES; rate_idx++) {
+-			s32 uninitialized_var(power_idx);
++			s32 power_idx;
+ 			int rc;
+ 
+ 			/* use channel group's clip-power table,
+diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+index da6d4202611c..a159d1d18c2c 100644
+--- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
++++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+@@ -2769,7 +2769,7 @@ il4965_hdl_tx(struct il_priv *il, struct il_rx_buf *rxb)
+ 	struct ieee80211_tx_info *info;
+ 	struct il4965_tx_resp *tx_resp = (void *)&pkt->u.raw[0];
+ 	u32 status = le32_to_cpu(tx_resp->u.status);
+-	int uninitialized_var(tid);
++	int tid;
+ 	int sta_id;
+ 	int freed;
+ 	u8 *qc = NULL;
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
+index 5b071b70bc08..0ae9cfc65272 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192cu/hw.c
+@@ -618,8 +618,8 @@ static void _rtl92cu_init_chipn_two_out_ep_priority(struct ieee80211_hw *hw,
+ 						     u8 queue_sel)
+ {
+ 	u16 beq, bkq, viq, voq, mgtq, hiq;
+-	u16 uninitialized_var(valuehi);
+-	u16 uninitialized_var(valuelow);
++	u16 valuehi;
++	u16 valuelow;
+ 
+ 	switch (queue_sel) {
+ 	case (TX_SELE_HQ | TX_SELE_LQ):
