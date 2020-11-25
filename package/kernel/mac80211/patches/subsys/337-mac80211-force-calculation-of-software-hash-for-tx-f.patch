@@ -1,0 +1,33 @@
+From: Felix Fietkau <nbd@nbd.name>
+Date: Wed, 25 Nov 2020 18:07:22 +0100
+Subject: [PATCH] mac80211: force calculation of software hash for tx fair
+ queueing
+
+Depending on the source, a hardware calculated hash may not provide the
+same level of collision resistance.
+
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+
+--- a/net/mac80211/tx.c
++++ b/net/mac80211/tx.c
+@@ -3937,7 +3937,8 @@ void __ieee80211_subif_start_xmit(struct
+ 	if (local->ops->wake_tx_queue) {
+ 		u16 queue = __ieee80211_select_queue(sdata, sta, skb);
+ 		skb_set_queue_mapping(skb, queue);
+-		skb_get_hash(skb);
++		if (!skb->sw_hash)
++			__skb_get_hash(skb);
+ 	}
+ 
+ 	if (sta) {
+@@ -4191,7 +4192,8 @@ static void ieee80211_8023_xmit(struct i
+ 	if (local->ops->wake_tx_queue) {
+ 		u16 queue = __ieee80211_select_queue(sdata, sta, skb);
+ 		skb_set_queue_mapping(skb, queue);
+-		skb_get_hash(skb);
++		if (!skb->sw_hash)
++			__skb_get_hash(skb);
+ 	}
+ 
+ 	if (unlikely(test_bit(SCAN_SW_SCANNING, &local->scanning)) &&
