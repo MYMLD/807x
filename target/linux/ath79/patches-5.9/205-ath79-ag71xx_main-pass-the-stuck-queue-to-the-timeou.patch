@@ -1,0 +1,30 @@
+From 4b1a4caf3aa6e561d84f3649e943078f3d2b1214 Mon Sep 17 00:00:00 2001
+From: CN_SZTL <cnsztl@project-openwrt.eu.org>
+Date: Sat, 28 Nov 2020 23:18:36 +0800
+Subject: [PATCH] ag71xx_main: pass the stuck queue to the timeout
+ handler
+
+This allows incrementing the correct timeout statistic without any mess.
+Down the road, devices can learn to reset just the specific queue.
+
+Signed-off-by: CN_SZTL <cnsztl@project-openwrt.eu.org>
+---
+ drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c     | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c b/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c
+index 118f8934cb..09906b2779 100644
+--- a/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c
++++ b/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c
+@@ -1193,7 +1193,7 @@ static void ag71xx_oom_timer_handler(struct timer_list *t)
+ 	napi_schedule(&ag->napi);
+ }
+ 
+-static void ag71xx_tx_timeout(struct net_device *dev)
++static void ag71xx_tx_timeout(struct net_device *dev, unsigned int txqueue)
+ {
+ 	struct ag71xx *ag = netdev_priv(dev);
+ 
+-- 
+2.20.1
+
