@@ -1,0 +1,47 @@
+From 8e13b41c08f8c5343ddf743acca4680b8278cbd6 Mon Sep 17 00:00:00 2001
+From: CN_SZTL <cnsztl@project-openwrt.eu.org>
+Date: Sat, 28 Nov 2020 22:31:50 +0800
+Subject: [PATCH] ag71xx_main: replace *ioremap_nocache with *ioremap
+
+*ioremap_nocache now is deprecated since kernel 5.9 [1].
+
+1. https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-5.9.y&id=4bdc0d676a643140
+
+Signed-off-by: CN_SZTL <cnsztl@project-openwrt.eu.org>
+---
+ drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c b/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c
+index 07d9992ca7..118f8934cb 100644
+--- a/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c
++++ b/drivers/net/ethernet/atheros/ag71xx/ag71xx_main.c
+@@ -936,7 +936,7 @@ __ag71xx_link_adjust(struct ag71xx *ag, bool update)
+ 		 * The wr, rr functions cannot be used since this hidden register
+ 		 * is outside of the normal ag71xx register block.
+ 		 */
+-		void __iomem *dam = ioremap_nocache(0xb90001bc, 0x4);
++		void __iomem *dam = ioremap(0xb90001bc, 0x4);
+ 		if (dam) {
+ 			__raw_writel(__raw_readl(dam) & ~BIT(27), dam);
+ 			(void)__raw_readl(dam);
+@@ -1579,14 +1579,14 @@ static int ag71xx_probe(struct platform_device *pdev)
+ 		ag->pllregmap = NULL;
+ 	}
+ 
+-	ag->mac_base = devm_ioremap_nocache(&pdev->dev, res->start,
++	ag->mac_base = devm_ioremap(&pdev->dev, res->start,
+ 					    res->end - res->start + 1);
+ 	if (!ag->mac_base)
+ 		return -ENOMEM;
+ 
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+ 	if (res) {
+-		ag->mii_base = devm_ioremap_nocache(&pdev->dev, res->start,
++		ag->mii_base = devm_ioremap(&pdev->dev, res->start,
+ 					    res->end - res->start + 1);
+ 		if (!ag->mii_base)
+ 			return -ENOMEM;
+-- 
+2.20.1
+
