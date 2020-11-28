@@ -1,0 +1,30 @@
+From 8c4ba4eabf631e6ad32fb4c0ce0089118da8eb82 Mon Sep 17 00:00:00 2001
+From: CN_SZTL <cnsztl@project-openwrt.eu.org>
+Date: Sat, 28 Nov 2020 22:24:42 +0800
+Subject: [PATCH] ar934x_nand: replace nand_release with nand_cleanup
+
+nand_release is now deprecated since kernel 5.9 [1].
+
+1. https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/include/linux/mtd/rawnand.h?h=linux-5.9.y&id=9630a055256de420d528ecde9f35902a9dcd8750
+
+Signed-off-by: CN_SZTL <cnsztl@project-openwrt.eu.org>
+---
+ drivers/mtd/nand/raw/ar934x_nand.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mtd/nand/raw/ar934x_nand.c b/drivers/mtd/nand/raw/ar934x_nand.c
+index 5f0026b475..8fd41d5af7 100644
+--- a/drivers/mtd/nand/raw/ar934x_nand.c
++++ b/drivers/mtd/nand/raw/ar934x_nand.c
+@@ -1462,7 +1462,7 @@ static int ar934x_nfc_remove(struct platform_device *pdev)
+ 
+ 	nfc = platform_get_drvdata(pdev);
+ 	if (nfc) {
+-		nand_release(&nfc->nand_chip);
++		nand_cleanup(&nfc->nand_chip);
+ 		ar934x_nfc_free_buf(nfc);
+ 	}
+ 
+-- 
+2.20.1
+
