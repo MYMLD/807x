@@ -51,7 +51,7 @@ endef
 define Device/Default
   PROFILES := Default
   KERNEL := kernel-bin
-  KERNEL_LOADADDR := 0x2080000
+  KERNEL_LOADADDR := 0x2000000
   IMAGES := sysupgrade.img.gz
   DEVICE_DTS = rockchip/$$(SOC)-$(lastword $(subst _, ,$(1)))
 endef

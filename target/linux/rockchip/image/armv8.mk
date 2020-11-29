@@ -22,7 +22,7 @@ define Device/friendlyarm_nanopi-r4s
   SOC := rk3399
   UBOOT_DEVICE_NAME := nanopi-r4s-rk3399
   IMAGE/sysupgrade.img.gz := boot-common | boot-script nanopi-r4s | pine64-img | gzip | append-metadata
-  DEVICE_PACKAGES := kmod-r8168
+  DEVICE_PACKAGES := kmod-r8169
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r4s
 
@@ -44,4 +44,4 @@ define Device/radxa_rock-pi-4
   IMAGE/sysupgrade.img.gz := boot-common | boot-script | pine64-img | gzip | append-metadata
   DEVICE_PACKAGES := brcmfmac-firmware-43456-sdio brcmfmac-nvram-43456-sdio kmod-brcmfmac
 endef
-TARGET_DEVICES += radxa_rock-pi-4
+# TARGET_DEVICES += radxa_rock-pi-4
