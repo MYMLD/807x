@@ -20,25 +20,52 @@ Signed-off-by: Leonidas P. Papadakos <papadakospan@gmail.com>
 
 --- a/arch/arm64/boot/dts/rockchip/rk3328.dtsi
 +++ b/arch/arm64/boot/dts/rockchip/rk3328.dtsi
-@@ -140,6 +140,21 @@
+@@ -140,6 +140,26 @@
  			opp-microvolt = <1300000>;
  			clock-latency-ns = <40000>;
  		};
 +		opp-1392000000 {
 +			opp-hz = /bits/ 64 <1392000000>;
-+			opp-microvolt = <1350000>;
++			opp-microvolt = <1325000>;
 +			clock-latency-ns = <40000>;
 +		};
 +		opp-1512000000 {
 +			opp-hz = /bits/ 64 <1512000000>;
-+			opp-microvolt = <1400000>;
++			opp-microvolt = <1375000>;
 +			clock-latency-ns = <40000>;
 +		};
 +		opp-1608000000 {
 +			opp-hz = /bits/ 64 <1608000000>;
-+			opp-microvolt = <1450000>;
++			opp-microvolt = <1425000>;
++			clock-latency-ns = <40000>;
++		};
++		opp-1704000000 {
++			opp-hz = /bits/ 64 <1704000000>;
++			opp-microvolt = <1475000>;
 +			clock-latency-ns = <40000>;
 +		};
  	};
  
  	amba: bus {
+--- a/arch/arm64/boot/dts/rockchip/rk3328-nanopi-r2s.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3328-nanopi-r2s.dts
+@@ -210,7 +210,7 @@
+ 				regulator-always-on;
+ 				regulator-boot-on;
+ 				regulator-min-microvolt = <712500>;
+-				regulator-max-microvolt = <1450000>;
++				regulator-max-microvolt = <1475000>;
+ 				regulator-ramp-delay = <12500>;
+ 
+ 				regulator-state-mem {
+--- a/drivers/clk/rockchip/clk-rk3328.c
++++ b/drivers/clk/rockchip/clk-rk3328.c
+@@ -23,6 +23,8 @@ enum rk3328_plls {
+ 
+ static struct rockchip_pll_rate_table rk3328_pll_rates[] = {
+ 	/* _mhz, _refdiv, _fbdiv, _postdiv1, _postdiv2, _dsmpd, _frac */
++	RK3036_PLL_RATE(1800000000, 1, 75, 1, 1, 1, 0),
++	RK3036_PLL_RATE(1704000000, 1, 71, 1, 1, 1, 0),
+ 	RK3036_PLL_RATE(1608000000, 1, 67, 1, 1, 1, 0),
+ 	RK3036_PLL_RATE(1584000000, 1, 66, 1, 1, 1, 0),
+ 	RK3036_PLL_RATE(1560000000, 1, 65, 1, 1, 1, 0),
