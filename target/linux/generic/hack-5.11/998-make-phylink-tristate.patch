@@ -1,7 +1,7 @@
 --- a/drivers/net/phy/Kconfig
 +++ b/drivers/net/phy/Kconfig
-@@ -245,7 +245,7 @@ endif
- endif
+@@ -4,7 +4,7 @@
+ #
  
  config PHYLINK
 -	tristate

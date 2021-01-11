@@ -53,7 +53,7 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
 +dma-shared-buffer-objs :=  $(dma-buf-objs-y)
 --- a/drivers/dma-buf/dma-buf.c
 +++ b/drivers/dma-buf/dma-buf.c
-@@ -1415,4 +1415,5 @@ static void __exit dma_buf_deinit(void)
+@@ -1428,4 +1428,5 @@ static void __exit dma_buf_deinit(void)
  	dma_buf_uninit_debugfs();
  	kern_unmount(dma_buf_mnt);
  }
