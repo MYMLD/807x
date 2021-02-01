@@ -1,0 +1,43 @@
+From: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+To: <linux-fsdevel@vger.kernel.org>
+Cc: <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
+	<pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
+	<willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
+	<mark@harmstone.com>, <nborisov@suse.com>,
+	<linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
+	<dan.carpenter@oracle.com>, <hch@lst.de>, <ebiggers@kernel.org>,
+	<andy.lavr@gmail.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v19 09/10] fs/ntfs3: Add NTFS3 in fs/Kconfig and fs/Makefile
+Date: Thu, 28 Jan 2021 12:04:54 +0300
+Message-ID: <20210128090455.3576502-10-almaz.alexandrovich@paragon-software.com> (raw)
+In-Reply-To: <20210128090455.3576502-1-almaz.alexandrovich@paragon-software.com>
+
+This adds NTFS3 in fs/Kconfig and fs/Makefile
+
+Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+---
+ fs/Kconfig  | 1 +
+ fs/Makefile | 1 +
+ 2 files changed, 2 insertions(+)
+
+--- a/fs/Kconfig
++++ b/fs/Kconfig
+@@ -143,6 +143,7 @@ menu "DOS/FAT/NT Filesystems"
+ 
+ source "fs/fat/Kconfig"
+ source "fs/ntfs/Kconfig"
++source "fs/ntfs3/Kconfig"
+ 
+ endmenu
+ endif # BLOCK
+--- a/fs/Makefile
++++ b/fs/Makefile
+@@ -98,6 +98,7 @@ obj-$(CONFIG_SYSV_FS)		+= sysv/
+ obj-$(CONFIG_CIFS)		+= cifs/
+ obj-$(CONFIG_HPFS_FS)		+= hpfs/
+ obj-$(CONFIG_NTFS_FS)		+= ntfs/
++obj-$(CONFIG_NTFS3_FS)		+= ntfs3/
+ obj-$(CONFIG_UFS_FS)		+= ufs/
+ obj-$(CONFIG_EFS_FS)		+= efs/
+ obj-$(CONFIG_JFFS2_FS)		+= jffs2/
