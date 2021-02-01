@@ -476,6 +476,27 @@ endef
 $(eval $(call KernelPackage,fs-ntfs))
 
 
+define KernelPackage/fs-ntfs3
+ SUBMENU:=$(FS_MENU)
+  TITLE:=NTFS filesystem support
+  KCONFIG:= \
+    CONFIG_NTFS3_FS \
+    CONFIG_NTFS3_LZX_XPRESS=y \
+    CONFIG_NTFS3_FS_POSIX_ACL=y \
+    CONFIG_NTFS3_64BIT_CLUSTER=n
+  FILES:=$(LINUX_DIR)/fs/ntfs3/ntfs3.ko
+  AUTOLOAD:=$(call AutoLoad,30,ntfs3)
+  CONFLICTS:=kmod-fs-ntfs
+  $(call AddDepends/nls)
+endef
+
+define KernelPackage/fs-ntfs3/description
+ Kernel module for NTFS3 filesystem support
+endef
+
+$(eval $(call KernelPackage,fs-ntfs3))
+
+
 define KernelPackage/fs-reiserfs
   SUBMENU:=$(FS_MENU)
   TITLE:=ReiserFS filesystem support
