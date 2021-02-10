@@ -10,20 +10,6 @@ s = m:section(TypedSection, "turboacc", "")
 s.addremove = false
 s.anonymous = true
 
-if nixio.fs.access("/lib/modules/" .. kernel_version .. "/xt_FLOWOFFLOAD.ko") then
-sw_flow = s:option(Flag, "sw_flow", translate("Software flow offloading"))
-sw_flow.default = 0
-sw_flow.description = translate("Software based offloading for routing/NAT")
-sw_flow:depends("sfe_flow", 0)
-end
-
-if luci.sys.call("cat /proc/cpuinfo | grep -q MT76") == 0 then
-hw_flow = s:option(Flag, "hw_flow", translate("Hardware flow offloading"))
-hw_flow.default = 0
-hw_flow.description = translate("Requires hardware NAT support. Implemented at least for mt76xx")
-hw_flow:depends("sw_flow", 1)
-end
-
 if nixio.fs.access("/lib/modules/" .. kernel_version .. "/fast-classifier.ko") then
 sfe_flow = s:option(Flag, "sfe_flow", translate("Shortcut-FE flow offloading"))
 sfe_flow.default = 0

@@ -183,28 +183,6 @@ endef
 $(eval $(call KernelPackage,fb-sys-ram))
 
 
-define KernelPackage/fb-tft
-  SUBMENU:=$(VIDEO_MENU)
-  TITLE:=Support for small TFT LCD display modules
-  DEPENDS:= \
-	  @GPIO_SUPPORT @!LINUX_4_9 +kmod-backlight \
-	  +kmod-fb +kmod-fb-sys-fops +kmod-fb-sys-ram +kmod-spi-bitbang
-  KCONFIG:= \
-       CONFIG_FB_BACKLIGHT=y \
-       CONFIG_FB_DEFERRED_IO=y \
-       CONFIG_FB_TFT
-  FILES:= \
-       $(LINUX_DIR)/drivers/staging/fbtft/fbtft.ko
-  AUTOLOAD:=$(call AutoLoad,08,fbtft)
-endef
-
-define KernelPackage/fb-tft/description
-  Support for small TFT LCD display modules
-endef
-
-$(eval $(call KernelPackage,fb-tft))
-
-
 define KernelPackage/fb-tft-ili9486
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=FB driver for the ILI9486 LCD Controller
@@ -228,8 +206,7 @@ define KernelPackage/drm
   DEPENDS:=+kmod-dma-buf +kmod-i2c-core
   KCONFIG:=CONFIG_DRM
   FILES:= \
-	$(LINUX_DIR)/drivers/gpu/drm/drm.ko \
-	$(LINUX_DIR)/drivers/gpu/drm/drm_panel_orientation_quirks.ko@ge4.15
+	$(LINUX_DIR)/drivers/gpu/drm/drm.ko
   AUTOLOAD:=$(call AutoLoad,05,drm)
 endef
 
@@ -284,9 +261,7 @@ define KernelPackage/drm-amdgpu
 	CONFIG_DRM_AMD_DC=y \
 	CONFIG_HSA_AMD=y \
 	CONFIG_DEBUG_KERNEL_DC=n
-  FILES:=$(LINUX_DIR)/drivers/gpu/drm/amd/amdgpu/amdgpu.ko \
-	$(LINUX_DIR)/drivers/gpu/drm/scheduler/gpu-sched.ko@ge4.15 \
-	$(LINUX_DIR)/drivers/gpu/drm/amd/lib/chash.ko@ge4.15
+  FILES:=$(LINUX_DIR)/drivers/gpu/drm/amd/amdgpu/amdgpu.ko
   AUTOLOAD:=$(call AutoProbe,amdgpu)
 endef
 
@@ -440,14 +415,10 @@ define KernelPackage/video-videobuf2
 	CONFIG_VIDEOBUF2_MEMOPS \
 	CONFIG_VIDEOBUF2_VMALLOC
   FILES:= \
-	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-core.ko@lt4.16 \
-	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-v4l2.ko@lt4.16 \
-	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-memops.ko@lt4.16 \
-	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-vmalloc.ko@lt4.16 \
-	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-common.ko@ge4.16 \
-	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-v4l2.ko@ge4.16 \
-	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-memops.ko@ge4.16 \
-	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-vmalloc.ko@ge4.16
+	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-core.ko \
+	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-v4l2.ko \
+	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-memops.ko \
+	$(LINUX_DIR)/drivers/media/$(V4L2_DIR)/videobuf2-vmalloc.ko
   AUTOLOAD:=$(call AutoLoad,65,videobuf2-core videobuf-v4l2@ge4.4 videobuf2-memops videobuf2-vmalloc)
   $(call AddDepends/video)
 endef
@@ -512,7 +483,7 @@ $(eval $(call KernelPackage,video-uvc))
 define KernelPackage/video-gspca-core
   MENU:=1
   TITLE:=GSPCA webcam core support framework
-  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-input-core +LINUX_4_19:kmod-video-videobuf2
+  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-input-core
   KCONFIG:=CONFIG_USB_GSPCA
   FILES:=$(LINUX_DIR)/drivers/media/$(V4L2_USB_DIR)/gspca/gspca_main.ko
   AUTOLOAD:=$(call AutoProbe,gspca_main)

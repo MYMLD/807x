@@ -127,23 +127,6 @@ endef
 
 $(eval $(call KernelPackage,geneve))
 
-define KernelPackage/nsh
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=Network Service Header (NSH) protocol
-  DEPENDS:=
-  KCONFIG:=CONFIG_NET_NSH
-  FILES:=$(LINUX_DIR)/net/nsh/nsh.ko@ge4.14
-  AUTOLOAD:=$(call AutoLoad,13,nsh)
-endef
-
-define KernelPackage/nsh/description
-  Network Service Header is an implementation of Service Function
-  Chaining (RFC 7665).  Requires kernel 4.14 or newer
-endef
-
-$(eval $(call KernelPackage,nsh))
-
-
 define KernelPackage/capi
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=CAPI (ISDN) Support
@@ -397,22 +380,6 @@ define KernelPackage/ip6-vti/description
 endef
 
 $(eval $(call KernelPackage,ip6-vti))
-
-
-define KernelPackage/xfrm-interface
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=IPsec XFRM Interface
-  DEPENDS:=+kmod-ipsec4 +kmod-ipsec6 @!LINUX_4_14 @!LINUX_4_9
-  KCONFIG:=CONFIG_XFRM_INTERFACE
-  FILES:=$(LINUX_DIR)/net/xfrm/xfrm_interface.ko
-  AUTOLOAD:=$(call AutoProbe,xfrm_interface)
-endef
-
-define KernelPackage/xfrm-interface/description
- Kernel module for XFRM interface support
-endef
-
-$(eval $(call KernelPackage,xfrm-interface))
 
 
 define KernelPackage/iptunnel4
@@ -788,21 +755,6 @@ endef
 $(eval $(call KernelPackage,sched-core))
 
 
-define KernelPackage/sched-cake
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=Cake fq_codel/blue derived shaper
-  DEPENDS:=@!LINUX_4_14 +kmod-sched-core
-  KCONFIG:=CONFIG_NET_SCH_CAKE
-  FILES:=$(LINUX_DIR)/net/sched/sch_cake.ko
-  AUTOLOAD:=$(call AutoProbe,sch_cake)
-endef
-
-define KernelPackage/sched-cake/description
- Common Applications Kept Enhanced fq_codel/blue derived shaper
-endef
-
-$(eval $(call KernelPackage,sched-cake))
-
 define KernelPackage/sched-flower
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=Flower traffic classifier
@@ -959,7 +911,7 @@ $(eval $(call KernelPackage,sched))
 define KernelPackage/tcp-bbr
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=BBR TCP congestion control
-  DEPENDS:=+LINUX_4_9:kmod-sched
+  DEPENDS:=+kmod-sched
   KCONFIG:= \
 	CONFIG_TCP_CONG_ADVANCED=y \
 	CONFIG_TCP_CONG_BBR=m
@@ -973,15 +925,9 @@ define KernelPackage/tcp-bbr/description
  For kernel 4.13+, TCP internal pacing is implemented as fallback.
 endef
 
-ifdef CONFIG_LINUX_4_9
-  TCP_BBR_SYSCTL_CONF:=sysctl-tcp-bbr-k4_9.conf
-else
-  TCP_BBR_SYSCTL_CONF:=sysctl-tcp-bbr.conf
-endif
-
 define KernelPackage/tcp-bbr/install
 	$(INSTALL_DIR) $(1)/etc/sysctl.d
-	$(INSTALL_DATA) ./files/$(TCP_BBR_SYSCTL_CONF) $(1)/etc/sysctl.d/12-tcp-bbr.conf
+	$(INSTALL_DATA) ./files/sysctl-tcp-bbr.conf $(1)/etc/sysctl.d/12-tcp-bbr.conf
 endef
 
 $(eval $(call KernelPackage,tcp-bbr))
@@ -1177,10 +1123,9 @@ define KernelPackage/rxrpc
 	CONFIG_RXKAD=m \
 	CONFIG_AF_RXRPC_DEBUG=n
   FILES:= \
-	$(LINUX_DIR)/net/rxrpc/af-rxrpc.ko@lt4.11 \
-	$(LINUX_DIR)/net/rxrpc/rxrpc.ko@ge4.11 \
-	$(LINUX_DIR)/net/rxrpc/rxkad.ko@lt4.7
-  AUTOLOAD:=$(call AutoLoad,30,rxkad@lt4.7 af-rxrpc.ko@lt4.11 rxrpc.ko@ge4.11)
+	$(LINUX_DIR)/net/rxrpc/af-rxrpc.ko \
+	$(LINUX_DIR)/net/rxrpc/rxkad.ko
+  AUTOLOAD:=$(call AutoLoad,30,rxkad af-rxrpc.ko)
   DEPENDS:= +kmod-crypto-manager +kmod-crypto-pcbc +kmod-crypto-fcrypt
 endef
 
@@ -1193,7 +1138,7 @@ $(eval $(call KernelPackage,rxrpc))
 define KernelPackage/mpls
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=MPLS support
-  DEPENDS:=+LINUX_4_19:kmod-iptunnel
+  DEPENDS:=+kmod-iptunnel
   KCONFIG:= \
 	CONFIG_MPLS=y \
 	CONFIG_LWTUNNEL=y \

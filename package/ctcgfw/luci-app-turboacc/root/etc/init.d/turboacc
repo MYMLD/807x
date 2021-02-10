@@ -8,8 +8,6 @@ restart_utils="true"
 
 inital_conf(){
 	config_load "turboacc"
-	config_get "sw_flow" "config" "sw_flow" "0"
-	config_get "hw_flow" "config" "hw_flow" "0"
 	config_get "sfe_flow" "config" "sfe_flow" "0"
 	config_get "sfe_bridge" "config" "sfe_bridge" "0"
 	config_get "sfe_ipv6" "config" "sfe_ipv6" "0"
@@ -21,7 +19,6 @@ inital_conf(){
 	config_get "dns_caching_v4_dns" "config" "dns_caching_v4_dns"
 	config_get "dns_caching_v6_dns" "config" "dns_caching_v6_dns"
 
-	[ ! -e "/lib/modules/$(uname -r)/xt_FLOWOFFLOAD.ko" ] && { sw_flow="0"; hw_flow="0"; }
 	[ ! -e "/lib/modules/$(uname -r)/fast-classifier.ko" ] && { sfe_flow="0"; sfe_bridge="0"; sfe_ipv6="0"; }
 	[ ! -e "/lib/modules/$(uname -r)/tcp_bbr.ko" ] && bbr_cca="0"
 	[ ! -e "/lib/modules/$(uname -r)/xt_FULLCONENAT.ko" ] && fullcone_nat="0"
@@ -213,12 +210,10 @@ revert_dns() {
 start(){
 	inital_conf
 
-	uci set firewall.@defaults[0].flow_offloading="${sw_flow}"
-	uci set firewall.@defaults[0].flow_offloading_hw="${hw_flow}"
 	uci set firewall.@defaults[0].fullcone="${fullcone_nat}"
 	uci commit firewall
 
-	[ "${sw_flow}" -ne "1" ] && [ "${sfe_flow}" -eq "1" ] && {
+	[ "${sfe_flow}" -eq "1" ] && {
 		lsmod | grep -q fast_classifier || modprobe fast_classifier 2>"/dev/null"
 		echo "${sfe_bridge}" > "/sys/fast_classifier/skip_to_bridge_ingress" 2>"/dev/null"
 		if [ "${sfe_ipv6}" -eq "1" ]; then
@@ -264,8 +259,6 @@ start(){
 stop(){
 	inital_conf
 
-	uci set firewall.@defaults[0].flow_offloading="${sw_flow}"
-	uci set firewall.@defaults[0].flow_offloading_hw="${hw_flow}"
 	uci set firewall.@defaults[0].fullcone="${fullcone_nat}"
 	uci commit firewall
 
