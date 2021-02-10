@@ -29,10 +29,10 @@ sfe_ipv6.description = translate("Enable IPv6 Acceleration")
 sfe_ipv6:depends("sfe_flow", 1)
 end
 
-if nixio.fs.access("/lib/modules/" .. kernel_version .. "/tcp_bbr.ko") then
-bbr_cca = s:option(Flag, "bbr_cca", translate("BBR CCA"))
-bbr_cca.default = 0
-bbr_cca.description = translate("Using BBR CCA can improve TCP network performance effectively")
+if nixio.fs.access("/lib/modules/" .. kernel_version .. "/tcp_hybla.ko") then
+hybla_cca = s:option(Flag, "hybla_cca", translate("HYBLA CCA"))
+hybla_cca.default = 0
+hybla_cca.description = translate("Using HYBLA CCA can improve TCP network performance effectively")
 end 
 
 if nixio.fs.access("/lib/modules/" .. kernel_version .. "/xt_FULLCONENAT.ko") then

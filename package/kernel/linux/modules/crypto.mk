@@ -108,10 +108,10 @@ $(eval $(call KernelPackage,crypto-cmac))
 define KernelPackage/crypto-crc32
   TITLE:=CRC32 CRC module
   DEPENDS:=+kmod-crypto-hash
-  KCONFIG:=CONFIG_CRYPTO_CRC32
+  KCONFIG:=CONFIG_CRYPTO_CRC32C
   HIDDEN:=1
-  FILES:=$(LINUX_DIR)/crypto/crc32_generic.ko
-  AUTOLOAD:=$(call AutoLoad,04,crc32_generic,1)
+  FILES:=$(LINUX_DIR)/crypto/crc32.ko
+  AUTOLOAD:=$(call AutoLoad,04,crc32,1)
   $(call AddDepends/crypto)
 endef
 

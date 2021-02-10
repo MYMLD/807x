@@ -14,7 +14,7 @@ PKG_LICENSE:=GPLv3.0+
 LUCI_TITLE:=LuCI support for Shortcut-FE
 LUCI_DEPENDS:=+pdnsd-alt \
               +PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe:kmod-fast-classifier \
-              +PACKAGE_$(PKG_NAME)_INCLUDE_bbr-cca:kmod-tcp-bbr \
+              +PACKAGE_$(PKG_NAME)_INCLUDE-hybla-cca:kmod-tcp-hybla \
               +PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder:dnsforwarder
 LUCI_PKGARCH:=all
 
@@ -23,8 +23,8 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe
 	bool "Include Shortcut-FE"
 	default y
 
-config PACKAGE_$(PKG_NAME)_INCLUDE_bbr-cca
-	bool "Include BBR CCA"
+config PACKAGE_$(PKG_NAME)_INCLUDE_hybla-cca
+	bool "Include HYBLA CCA"
 	default y
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder
@@ -34,7 +34,7 @@ endef
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_bbr-cca \
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_hybla-cca \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder
 
 include $(TOPDIR)/feeds/luci/luci.mk

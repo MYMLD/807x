@@ -11,7 +11,7 @@ inital_conf(){
 	config_get "sfe_flow" "config" "sfe_flow" "0"
 	config_get "sfe_bridge" "config" "sfe_bridge" "0"
 	config_get "sfe_ipv6" "config" "sfe_ipv6" "0"
-	config_get "bbr_cca" "config" "bbr_cca" "0"
+	config_get "hybla_cca" "config" "hybla_cca" "0"
 	config_get "fullcone_nat" "config" "fullcone_nat" "0"
 	config_get "dns_acc" "config" "dns_acc" "0"
 	config_get "dns_caching" "config" "dns_caching" "0"
@@ -20,7 +20,7 @@ inital_conf(){
 	config_get "dns_caching_v6_dns" "config" "dns_caching_v6_dns"
 
 	[ ! -e "/lib/modules/$(uname -r)/fast-classifier.ko" ] && { sfe_flow="0"; sfe_bridge="0"; sfe_ipv6="0"; }
-	[ ! -e "/lib/modules/$(uname -r)/tcp_bbr.ko" ] && bbr_cca="0"
+	[ ! -e "/lib/modules/$(uname -r)/tcp_hybla.ko" ] && hybla_cca="0"
 	[ ! -e "/lib/modules/$(uname -r)/xt_FULLCONENAT.ko" ] && fullcone_nat="0"
 }
 
@@ -223,8 +223,8 @@ start(){
 		fi
 }
 
-	if [ "${bbr_cca}" -eq "1" ];  then
-		sysctl -w net.ipv4.tcp_congestion_control="bbr"
+	if [ "${hybla_cca}" -eq "1" ];  then
+		sysctl -w net.ipv4.tcp_congestion_control="hybla"
 	else
 		sysctl -w net.ipv4.tcp_congestion_control="cubic"
 	fi	

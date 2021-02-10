@@ -16,8 +16,8 @@ local function fastpath_status()
 	return luci.sys.call("{ [ -e /sys/module/xt_FLOWOFFLOAD/refcnt ] && [ x$(cat /sys/module/xt_FLOWOFFLOAD/refcnt 2>/dev/null) != x0 ]; } || lsmod | grep -q fast_classifier") == 0
 end
 
-local function bbr_status()
-	return luci.sys.call("[ x$(cat /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null) = xbbr ]") == 0
+local function hybla_status()
+	return luci.sys.call("[ x$(cat /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null) = xhybla ]") == 0
 end
 
 local function fullconebat_status()
@@ -32,7 +32,7 @@ function action_status()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
 		fastpath_state = fastpath_status(),
-		bbr_state = bbr_status(),
+		hybla_state = hybla_status(),
 		fullconenat_state = fullconebat_status(),
 		dnscaching_state = dnscaching_status()
 	})
