@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-PKG_NAME:=sched-cake-oot
+PKG_NAME:=sched-cake
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
@@ -20,7 +20,7 @@ PKG_MAINTAINER:=Kevin Darbyshire-Bryant <ldir@darbyshire-bryant.me.uk>
 
 include $(INCLUDE_DIR)/package.mk
 
-define KernelPackage/sched-cake-oot
+define KernelPackage/sched-cake
   SUBMENU:=Network Support
   TITLE:=OOT Cake fq_codel/blue derived shaper
   URL:=https://github.com/dtaht/sch_cake
@@ -29,15 +29,15 @@ define KernelPackage/sched-cake-oot
   DEPENDS:=+kmod-sched-core +kmod-ipt-conntrack
 endef
 
-define KernelPackage/sched-cake-oot/description
-  O(ut) O(f) T(ree) Common Applications Kept Enhanced fq_codel/blue derived shaper
+define KernelPackage/sched-cake/description
+  Common Applications Kept Enhanced fq_codel/blue derived shaper
 endef
 
 define KernelPackage/sched-cake-virtual
   SUBMENU:=Network Support
   TITLE:=Virtual package for sched-cake
   URL:=https://github.com/dtaht/sch_cake
-  DEPENDS:=+kmod-sched-cake-oot
+  DEPENDS:=+kmod-sched-cake
 endef
 
 define KernelPackage/sched-cake-virtual/description
@@ -50,5 +50,5 @@ define Build/Compile
 	$(KERNEL_MAKE) M="$(PKG_BUILD_DIR)" modules
 endef
 
-$(eval $(call KernelPackage,sched-cake-oot))
+$(eval $(call KernelPackage,sched-cake))
 $(eval $(call KernelPackage,sched-cake-virtual))

@@ -392,7 +392,7 @@ define KernelPackage/crypto-iv
   KCONFIG:= CONFIG_CRYPTO_BLKCIPHER2
   HIDDEN:=1
   FILES:= \
-	$(LINUX_DIR)/crypto/eseqiv.ko
+	$(LINUX_DIR)/crypto/eseqiv.ko \
 	$(LINUX_DIR)/crypto/chainiv.ko
   AUTOLOAD:=$(call AutoLoad,10,eseqiv chainiv)
   $(call AddDepends/crypto)
