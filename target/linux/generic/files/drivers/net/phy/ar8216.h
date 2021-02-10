@@ -30,9 +30,6 @@
 
 /* size of the vlan table */
 #define AR8X16_MAX_VLANS	128
-#define AR83X7_MAX_VLANS	4096
-#define AR8XXX_MAX_VLANS	AR83X7_MAX_VLANS
-
 #define AR8X16_PROBE_RETRIES	10
 #define AR8X16_MAX_PORTS	8
 
@@ -115,7 +112,6 @@
 
 #define AR8216_REG_ATU_FUNC2		0x0058
 #define   AR8216_ATU_PORTS		BITS(0, 6)
-#define   AR8216_ATU_PORTS_S		0
 #define   AR8216_ATU_PORT0		BIT(0)
 #define   AR8216_ATU_PORT1		BIT(1)
 #define   AR8216_ATU_PORT2		BIT(2)
@@ -371,7 +367,7 @@ enum arl_op {
 };
 
 struct arl_entry {
-	u16 portmap;
+	u8 port;
 	u8 mac[6];
 };
 
@@ -416,7 +412,6 @@ struct ar8xxx_chip {
 	void (*get_arl_entry)(struct ar8xxx_priv *priv, struct arl_entry *a,
 			      u32 *status, enum arl_op op);
 	int (*sw_hw_apply)(struct switch_dev *dev);
-	void (*phy_rgmii_set)(struct ar8xxx_priv *priv, struct phy_device *phydev);
 
 	const struct ar8xxx_mib_desc *mib_decs;
 	unsigned num_mibs;
@@ -456,9 +451,8 @@ struct ar8xxx_priv {
 
 	/* all fields below are cleared on reset */
 	bool vlan;
-
-	u16 vlan_id[AR8XXX_MAX_VLANS];
-	u8 vlan_table[AR8XXX_MAX_VLANS];
+	u16 vlan_id[AR8X16_MAX_VLANS];
+	u8 vlan_table[AR8X16_MAX_VLANS];
 	u8 vlan_tagged;
 	u16 pvid[AR8X16_MAX_PORTS];
 	int arl_age_time;
@@ -468,7 +462,6 @@ struct ar8xxx_priv {
 	bool mirror_tx;
 	int source_port;
 	int monitor_port;
-	u8 port_vlan_prio[AR8X16_MAX_PORTS];
 };
 
 u32
@@ -482,9 +475,6 @@ ar8xxx_write(struct ar8xxx_priv *priv, int reg, u32 val);
 u32
 ar8xxx_rmw(struct ar8xxx_priv *priv, int reg, u32 mask, u32 val);
 
-void
-ar8xxx_phy_dbg_read(struct ar8xxx_priv *priv, int phy_addr,
-		u16 dbg_addr, u16 *dbg_data);
 void
 ar8xxx_phy_dbg_write(struct ar8xxx_priv *priv, int phy_addr,
 		     u16 dbg_addr, u16 dbg_data);

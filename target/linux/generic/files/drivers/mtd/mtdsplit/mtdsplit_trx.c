@@ -17,7 +17,6 @@
 #include <linux/mtd/mtd.h>
 #include <linux/mtd/partitions.h>
 #include <linux/byteorder/generic.h>
-#include <linux/of.h>
 
 #include "mtdsplit.h"
 
@@ -57,7 +56,7 @@ read_trx_header(struct mtd_info *mtd, size_t offset,
 
 static int
 mtdsplit_parse_trx(struct mtd_info *master,
-		   const struct mtd_partition **pparts,
+		   struct mtd_partition **pparts,
 		   struct mtd_part_parser_data *data)
 {
 	struct mtd_partition *parts;
@@ -131,22 +130,9 @@ err:
 	return ret;
 }
 
-#include <linux/version.h>
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
-static const struct of_device_id trx_parser_of_match_table[] = {
-	{ .compatible = "openwrt,trx" },
-	{},
-};
-MODULE_DEVICE_TABLE(of, trx_parser_of_match_table);
-#endif
-
 static struct mtd_part_parser trx_parser = {
 	.owner = THIS_MODULE,
 	.name = "trx-fw",
-	#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
-	.of_match_table = trx_parser_of_match_table,
-	#endif
 	.parse_fn = mtdsplit_parse_trx,
 	.type = MTD_PARSER_TYPE_FIRMWARE,
 };
