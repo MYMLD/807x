@@ -120,7 +120,7 @@ define Device/linksys_ea8500
 	UBINIZE_OPTS := -E 5
 	IMAGES := factory.bin sysupgrade.bin
 	IMAGE/factory.bin := append-kernel | pad-to $$$${KERNEL_SIZE} | append-ubi
-	DEVICE_PACKAGES := ath10k-firmware-qca99x0-ct
+	DEVICE_PACKAGES := ath10k-firmware-qca99x0-ct kmod-qca-nss-gmac
 endef
 TARGET_DEVICES += linksys_ea8500
 
@@ -324,7 +324,7 @@ define Device/zyxel_nbg6817
 	RAS_ROOTFS_SIZE := 20934k
 	RAS_VERSION := "V1.99(OWRT.9999)C0"
 	SUPPORTED_DEVICES += nbg6817
-	DEVICE_PACKAGES := ath10k-firmware-qca9984-ct e2fsprogs kmod-fs-ext4 losetup
+	DEVICE_PACKAGES := ath10k-firmware-qca9984-ct kmod-qca-nss-gmac e2fsprogs kmod-fs-ext4 losetup
 	$(call Device/ZyXELImage)
 endef
 TARGET_DEVICES += zyxel_nbg6817
