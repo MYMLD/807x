@@ -1,0 +1,122 @@
+From 54bbebd21482d7733b2646cb03041eb1a269ca5b Mon Sep 17 00:00:00 2001
+From: Tianling Shen <cnsztl@gmail.com>
+Date: Mon, 15 Feb 2021 01:30:42 +0800
+Subject: [PATCH] rockchip: rk3399: Add support for FriendlyARM NanoPi M4V2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This adds support for the NanoPi M4V2 from FriendlyArm.
+
+SoC: Rockchip RK3399
+PMU: RK808-D PMIC
+RAM: Dual-Channel 4GB LPDDR4
+Ethernet: Native Gigabit Ethernet
+Wi-Fi/BT: 802.11a/b/g/n/ac, Bluetooth 4.1
+Video Input: one or two 4-Lane MIPI-CSI, dual ISP
+Video output
+Audio Out: 3.5mm Dual channel headphone jack, or HDMI
+Audio In: one microphone input interface
+USB 3.0: four USB 3.0 Type-A ports
+USB Type-C: Supports USB2.0 OTG and Power input
+microSD Slot x 1
+40Pin GPIO Extension ports
+24Pin Extension ports
+2 independent native USB 2.0 Host
+PCIe x2
+PWM x1, PowerKey
+Buttons：one PowerKey, one Recovery Key
+Debug: one Debug UART, 4 Pin 2.54mm header, 3V level, 1500000bps
+LED: 1 x power LED and 1 x GPIO Controlled LED
+RTC Battery: 2 Pin 1.27/1.25mm RTC battery input connector
+
+Co-authored-by: Piotr Szczepanik <piter75@gmail.com>
+Signed-off-by: Piotr Szczepanik <piter75@gmail.com>
+Signed-off-by: Tianling Shen <cnsztl@gmail.com>
+---
+ arch/arm64/boot/dts/rockchip/Makefile         |  1 +
+ .../boot/dts/rockchip/rk3399-nanopi-m4v2.dts  | 68 +++++++++++++++++++
+ 2 files changed, 69 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/rockchip/rk3399-nanopi-m4v2.dts
+
+--- a/arch/arm64/boot/dts/rockchip/Makefile
++++ b/arch/arm64/boot/dts/rockchip/Makefile
+@@ -23,6 +23,7 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-khadas-edge-v.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-leez-p710.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-nanopc-t4.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-nanopi-m4.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-nanopi-m4v2.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-nanopi-neo4.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-orangepi.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-puma-haikou.dtb
+--- /dev/null
++++ b/arch/arm64/boot/dts/rockchip/rk3399-nanopi-m4v2.dts
+@@ -0,0 +1,68 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (c) 2019 Piotr Szczepanik <piter75@gmail.com>
++ * Copyright (c) 2021 Tianling Shen <cnsztl@gmail.com>
++ */
++
++#include "rk3399-nanopi-m4.dts"
++
++/ {
++	model = "FriendlyElec NanoPi M4V2";
++	compatible = "friendlyarm,nanopi-m4v2", "rockchip,rk3399";
++
++	rt5651-sound {
++		compatible = "simple-audio-card";
++		simple-audio-card,name = "realtek,rt5651-codec";
++		simple-audio-card,format = "i2s";
++		simple-audio-card,mclk-fs = <256>;
++		simple-audio-card,widgets =
++			"Microphone", "Mic Jack",
++			"Headphone", "Headphone Jack";
++		simple-audio-card,routing =
++			"Mic Jack", "micbias1",
++			"IN1P", "Mic Jack",
++			"Headphone Jack", "HPOL",
++			"Headphone Jack", "HPOR";
++		simple-audio-card,cpu {
++			sound-dai = <&i2s1>;
++		};
++		simple-audio-card,codec {
++			sound-dai = <&rt5651>;
++		};
++	};
++};
++
++&gmac {
++	rx_delay = <0x16>;
++};
++
++&hdmi_sound {
++	status = "okay";
++};
++
++&i2c0 {
++	rt5651: rt5651@1a {
++		compatible = "realtek,rt5651";
++		reg = <0x1a>;
++		clocks = <&cru SCLK_I2S_8CH_OUT>;
++		clock-names = "mclk";
++		hp-det-gpio = <&gpio4 RK_PC4 GPIO_ACTIVE_LOW>;
++		#sound-dai-cells = <0>;
++	};
++};
++
++&i2s1 {
++	rockchip,playback-channels = <8>;
++	rockchip,capture-channels = <8>;
++	status = "okay";
++};
++
++&i2s2 {
++	status = "okay";
++};
++
++&spdif {
++	i2c-scl-rising-time-ns = <450>;
++	i2c-scl-falling-time-ns = <15>;
++	status = "okay";
++};

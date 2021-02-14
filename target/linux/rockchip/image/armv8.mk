@@ -2,6 +2,16 @@
 #
 # Copyright (C) 2020 Tobias Maedel
 
+define Device/friendlyarm_nanopi-m4v2
+  DEVICE_VENDOR := FriendlyARM
+  DEVICE_MODEL := NanoPi M4V2
+  SOC := rk3399
+  UBOOT_DEVICE_NAME := nanopi-m4v2-rk3399
+  IMAGE/sysupgrade.img.gz := boot-common | boot-script | pine64-img | gzip | append-metadata
+  DEVICE_PACKAGES := kmod-bluetooth kmod-brcmfmac cypress-firmware-4356-sdio wpad-basic
+endef
+TARGET_DEVICES += friendlyarm_nanopi-m4v2
+
 define Device/friendlyarm_nanopi-r2s
   DEVICE_VENDOR := FriendlyARM
   DEVICE_MODEL := NanoPi R2S

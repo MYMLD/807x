@@ -1,0 +1,31 @@
+From e354aea54588e8bdb7afa56c51a3f8dc9666ea6c Mon Sep 17 00:00:00 2001
+From: Piotr Szczepanik <piter75@gmail.com>
+Date: Mon, 15 Feb 2021 01:27:56 +0800
+Subject: [PATCH] ASoC: rockchip: Add machine driver for rt5651 codec
+
+The driver is used for rockchip board using a rt5651.
+
+Signed-off-by: Piotr Szczepanik <piter75@gmail.com>
+Signed-off-by: Tianling Shen <cnsztl@gmail.com>
+---
+ sound/soc/rockchip/Kconfig | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+--- a/sound/soc/rockchip/Kconfig
++++ b/sound/soc/rockchip/Kconfig
+@@ -53,6 +53,15 @@ config SND_SOC_ROCKCHIP_RT5645
+ 	  Say Y or M here if you want to add support for SoC audio on Rockchip
+ 	  boards using the RT5645/RT5650 codec, such as Veyron.
+ 
++config SND_SOC_ROCKCHIP_RT5651
++	tristate "ASoC support for Rockchip boards using a RT5651 codec"
++	depends on SND_SOC_ROCKCHIP && I2C && GPIOLIB && CLKDEV_LOOKUP
++	select SND_SOC_ROCKCHIP_I2S
++	select SND_SOC_RT5651
++	help
++	  Say Y or M here if you want to add support for SoC audio on Rockchip
++	  boards using the RT5651 codec, such as FriendlyARM's Nano{Pi,PC} family.
++
+ config SND_SOC_RK3288_HDMI_ANALOG
+ 	tristate "ASoC support multiple codecs for Rockchip RK3288 boards"
+ 	depends on SND_SOC_ROCKCHIP && I2C && GPIOLIB && CLKDEV_LOOKUP
