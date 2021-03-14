@@ -40,6 +40,12 @@ msgstr "IPv6 加速"
 msgid "Enable IPv6 Acceleration"
 msgstr "启用 IPv6 加速"
 
+msgid "NATFlow flow offloading"
+msgstr "NATFlow 流量分载"
+
+msgid "NATFlow based offloading for routing/NAT"
+msgstr "基于 NATFlow 的 Routing/NAT 分载"
+
 msgid "BBR CCA"
 msgstr "BBR 拥塞控制算法"
 

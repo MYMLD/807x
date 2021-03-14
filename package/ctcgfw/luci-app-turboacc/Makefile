@@ -1,50 +1,64 @@
-# Copyright (C) 2016 Openwrt.org
 #
-# This is free software, licensed under the Apache License, Version 2.0 .
+# Copyright (C) 2021 ImmortalWrt
+# <https://immortalwrt.org>
+#
+# This is free software, licensed under the GNU General Public License v3.
+# See /LICENSE for more information.
 #
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-turboacc
 PKG_VERSION:=1.0
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
-PKG_LICENSE:=GPLv3.0+
+PKG_LICENSE:=GPL-3.0-only
+PKG_LICENSE_FILE:=LICENSE
+PKG_MAINTAINTER:=Tianling Shen <cnsztl@immortalwrt.org>
 
-LUCI_TITLE:=LuCI support for Flow Offload / Shortcut-FE
-LUCI_DEPENDS:=+pdnsd-alt \
-              +PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe:kmod-fast-classifier \
-              +PACKAGE_$(PKG_NAME)_INCLUDE_flow-offload:kmod-ipt-offload \
-              +PACKAGE_$(PKG_NAME)_INCLUDE_bbr-cca:kmod-tcp-bbr \
-              +PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder:dnsforwarder
+LUCI_TITLE:=LuCI support for Flow Offloading
+LUCI_DEPENDS:= \
+	+pdnsd-alt \
+	+wget-ssl \
+	+PACKAGE_TURBOACC_INCLUDE_OFFLOADING:kmod-ipt-offload \
+	+PACKAGE_TURBOACC_INCLUDE_SHORTCUT_FE:kmod-fast-classifier \
+	+PACKAGE_TURBOACC_INCLUDE_NATFLOW:kmod-natflow \
+	+PACKAGE_TURBOACC_INCLUDE_BBR_CCA:kmod-tcp-bbr \
+	+PACKAGE_TURBOACC_INCLUDE_DNSFORWARDER:dnsforwarder
 LUCI_PKGARCH:=all
 
-define Package/$(PKG_NAME)/config
-config PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe
-	bool "Include Shortcut-FE"
-	depends on PACKAGE_$(PKG_NAME)_INCLUDE_flow-offload=n
-	default y if LINUX_4_9
-	default n
-
-config PACKAGE_$(PKG_NAME)_INCLUDE_flow-offload
-	bool "Include Flow Offload"
-	depends on !LINUX_4_9
+define Package/luci-app-turboacc/config
+config PACKAGE_TURBOACC_INCLUDE_OFFLOADING
+	bool "Include Offloading"
+	depends on !LINUX_4_9 && \
+		PACKAGE_TURBOACC_INCLUDE_SHORTCUT_FE=n && \
+		PACKAGE_TURBOACC_INCLUDE_NATFLOW=n
 	default y
 
-config PACKAGE_$(PKG_NAME)_INCLUDE_bbr-cca
+config PACKAGE_TURBOACC_INCLUDE_SHORTCUT_FE
+	bool "Include Shortcut FE"
+	depends on PACKAGE_TURBOACC_INCLUDE_NATFLOW=n
+	default y if LINUX_4_9
+
+config PACKAGE_TURBOACC_INCLUDE_NATFLOW
+	bool "Include NATFlow"
+	default n
+
+config PACKAGE_TURBOACC_INCLUDE_BBR_CCA
 	bool "Include BBR CCA"
 	default y
 
-config PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder
+config PACKAGE_TURBOACC_INCLUDE_DNSFORWARDER
 	bool "Include DNSForwarder"
 	default n
 endef
 
 PKG_CONFIG_DEPENDS:= \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_shortcut-fe \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_flow-offload \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_bbr-cca \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder
+	CONFIG_PACKAGE_TURBOACC_INCLUDE_OFFLOADING \
+	CONFIG_PACKAGE_TURBOACC_INCLUDE_SHORTCUT_FE \
+	CONFIG_PACKAGE_TURBOACC_INCLUDE_NATFLOW \
+	CONFIG_PACKAGE_TURBOACC_INCLUDE_BBR_CCA \
+	CONFIG_PACKAGE_TURBOACC_INCLUDE_DNSFORWARDER
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

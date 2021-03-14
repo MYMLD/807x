@@ -14,7 +14,7 @@ if nixio.fs.access("/lib/modules/" .. kernel_version .. "/xt_FLOWOFFLOAD.ko") th
 sw_flow = s:option(Flag, "sw_flow", translate("Software flow offloading"))
 sw_flow.default = 0
 sw_flow.description = translate("Software based offloading for routing/NAT")
-sw_flow:depends("sfe_flow", 0)
+sfe_flow:depends({sfe_flow = "0", nat_flow = "0"})
 end
 
 if luci.sys.call("cat /proc/cpuinfo | grep -q MT76") == 0 then
@@ -28,7 +28,7 @@ if nixio.fs.access("/lib/modules/" .. kernel_version .. "/fast-classifier.ko") t
 sfe_flow = s:option(Flag, "sfe_flow", translate("Shortcut-FE flow offloading"))
 sfe_flow.default = 0
 sfe_flow.description = translate("Shortcut-FE based offloading for routing/NAT")
-sfe_flow:depends("sw_flow", 0)
+sfe_flow:depends({sw_flow = "0", nat_flow = "0"})
 end
 
 sfe_bridge = s:option(Flag, "sfe_bridge", translate("Bridge Acceleration"))
@@ -41,6 +41,13 @@ sfe_ipv6 = s:option(Flag, "sfe_ipv6", translate("IPv6 Acceleration"))
 sfe_ipv6.default = 0
 sfe_ipv6.description = translate("Enable IPv6 Acceleration")
 sfe_ipv6:depends("sfe_flow", 1)
+end
+
+if nixio.fs.access("/lib/modules/" .. kernel_version .. "/natflow.ko") then
+nat_flow = s:option(Flag, "nat_flow", translate("NATFlow flow offloading"))
+nat_flow.default = 0
+nat_flow.description = translate("NATFlow based offloading for routing/NAT")
+sfe_flow:depends({sw_flow = "0", sfe_flow = "0"})
 end
 
 if nixio.fs.access("/lib/modules/" .. kernel_version .. "/tcp_bbr.ko") then
