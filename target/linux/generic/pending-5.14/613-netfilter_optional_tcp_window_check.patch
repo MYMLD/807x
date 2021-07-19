@@ -28,7 +28,7 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
  	/*
  	 * Get the required data from the packet.
  	 */
-@@ -1115,7 +1121,7 @@ int nf_conntrack_tcp_packet(struct nf_co
+@@ -1151,7 +1157,7 @@ int nf_conntrack_tcp_packet(struct nf_co
  		 IP_CT_TCP_FLAG_DATA_UNACKNOWLEDGED &&
  		 timeouts[new_state] > timeouts[TCP_CONNTRACK_UNACK])
  		timeout = timeouts[TCP_CONNTRACK_UNACK];
@@ -49,7 +49,7 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
  static bool enable_hooks __read_mostly;
  MODULE_PARM_DESC(enable_hooks, "Always enable conntrack hooks");
  module_param(enable_hooks, bool, 0000);
-@@ -666,6 +669,7 @@ enum nf_ct_sysctl_index {
+@@ -667,6 +670,7 @@ enum nf_ct_sysctl_index {
  	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE_STREAM,
  #endif
  
@@ -57,7 +57,7 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
  	__NF_SYSCTL_CT_LAST_SYSCTL,
  };
  
-@@ -1016,6 +1020,13 @@ static struct ctl_table nf_ct_sysctl_tab
+@@ -1025,6 +1029,13 @@ static struct ctl_table nf_ct_sysctl_tab
  		.proc_handler   = proc_dointvec_jiffies,
  	},
  #endif
