@@ -1,0 +1,33 @@
+diff --git a/rfs_cm.c b/rfs_cm.c
+index 531ea7f..4a7839c 100644
+--- a/rfs_cm.c
++++ b/rfs_cm.c
+@@ -716,13 +716,15 @@ int rfs_cm_start(void)
+ 		return 0;
+ 
+ 	RFS_DEBUG("RFS cm start\n");
+-#ifdef CONFIG_NF_CONNTRACK_EVENTS
++#ifdef CONFIG_NF_CONNTRACK_CHAIN_EVENTS
++	ret = nf_conntrack_register_chain_notifier(&init_net, &rfs_cm_conntrack_notifier);
++#else
+ 	ret = nf_conntrack_register_notifier(&init_net, &rfs_cm_conntrack_notifier);
++#endif
+ 	if (ret < 0) {
+ 		RFS_ERROR("can't register nf notifier hook: %d\n", ret);
+ 		return -1;
+ 	}
+-#endif
+ 
+ #ifdef DEBUG_ESS_SKB_RXHASH
+ 	nf_register_hooks(rfs_cm_nf_hooks, ARRAY_SIZE(rfs_cm_nf_hooks));
+@@ -747,7 +749,9 @@ int rfs_cm_stop(void)
+ 	nf_unregister_hooks(rfs_cm_nf_hooks, ARRAY_SIZE(rfs_cm_nf_hooks));
+ #endif
+ 
+-#ifdef CONFIG_NF_CONNTRACK_EVENTS
++#ifdef CONFIG_NF_CONNTRACK_CHAIN_EVENTS
++	nf_conntrack_register_chain_notifier(&init_net, &rfs_cm_conntrack_notifier);
++#else
+ 	nf_conntrack_unregister_notifier(&init_net, &rfs_cm_conntrack_notifier);
+ #endif
+ 
