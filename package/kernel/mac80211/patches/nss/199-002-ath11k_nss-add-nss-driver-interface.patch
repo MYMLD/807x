@@ -19,7 +19,7 @@ Signed-off-by: Sriram R <srirrama@codeaurora.org>
 
 --- a/drivers/net/wireless/ath/ath11k/Kconfig
 +++ b/drivers/net/wireless/ath/ath11k/Kconfig
-@@ -11,6 +11,15 @@ config ATH11K
+@@ -12,6 +12,15 @@ config ATH11K
  
  	  If you choose to build a module, it'll be called ath11k.
  
@@ -37,7 +37,7 @@ Signed-off-by: Sriram R <srirrama@codeaurora.org>
  	depends on m
 --- a/drivers/net/wireless/ath/ath11k/Makefile
 +++ b/drivers/net/wireless/ath/ath11k/Makefile
-@@ -27,6 +27,7 @@ ath11k-$(CONFIG_THERMAL) += thermal.o
+@@ -23,6 +23,7 @@ ath11k-$(CPTCFG_NL80211_TESTMODE) += tes
  ath11k-$(CPTCFG_ATH11K_TRACING) += trace.o
  ath11k-$(CONFIG_THERMAL) += thermal.o
  ath11k-$(CPTCFG_ATH11K_SPECTRAL) += spectral.o
@@ -2661,15 +2661,15 @@ Signed-off-by: Sriram R <srirrama@codeaurora.org>
 +#endif
 --- a/drivers/net/wireless/ath/ath11k/hif.h
 +++ b/drivers/net/wireless/ath/ath11k/hif.h
-@@ -29,6 +29,7 @@ struct ath11k_hif_ops {
+@@ -24,6 +24,7 @@ struct ath11k_hif_ops {
  				   u32 *base_vector);
  	void (*get_msi_address)(struct ath11k_base *ab, u32 *msi_addr_lo,
  				u32 *msi_addr_hi);
 +	u32 (*get_window_offset)(struct ath11k_base *ab, u32 offset);
  };
  
- static inline void ath11k_hif_ce_irq_enable(struct ath11k_base *ab)
-@@ -126,4 +127,11 @@ static inline void ath11k_get_msi_addres
+ static inline int ath11k_hif_start(struct ath11k_base *sc)
+@@ -92,4 +93,11 @@ static inline void ath11k_get_msi_addres
  
  	ab->hif.ops->get_msi_address(ab, msi_addr_lo, msi_addr_hi);
  }
@@ -2683,8 +2683,8 @@ Signed-off-by: Sriram R <srirrama@codeaurora.org>
  #endif /* _HIF_H_ */
 --- a/drivers/net/wireless/ath/ath11k/pci.c
 +++ b/drivers/net/wireless/ath/ath11k/pci.c
-@@ -174,6 +174,20 @@ static inline u32 ath11k_pci_get_window_
- 	return window_start;
+@@ -130,6 +130,20 @@ static inline void ath11k_pci_select_win
+ 	}
  }
  
 +static inline u32 ath11k_pci_get_window_offset(struct ath11k_base *ab,
@@ -2704,10 +2704,10 @@ Signed-off-by: Sriram R <srirrama@codeaurora.org>
  void ath11k_pci_write32(struct ath11k_base *ab, u32 offset, u32 value)
  {
  	struct ath11k_pci *ab_pci = ath11k_pci_priv(ab);
-@@ -1180,6 +1194,7 @@ static const struct ath11k_hif_ops ath11
-	.get_msi_address =  ath11k_pci_get_msi_address,
-	.get_user_msi_vector = ath11k_get_user_msi_assignment,
-	.map_service_to_pipe = ath11k_pci_map_service_to_pipe,
+@@ -874,6 +888,7 @@ static const struct ath11k_hif_ops ath11
+ 	.get_msi_address =  ath11k_pci_get_msi_address,
+ 	.get_user_msi_vector = ath11k_get_user_msi_assignment,
+ 	.map_service_to_pipe = ath11k_pci_map_service_to_pipe,
 +	.get_window_offset = ath11k_pci_get_window_offset,
  };
  
